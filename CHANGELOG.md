@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [9.0.0-proxy.1] - 2025-10-02
+
+### Changed
+
+- JetBrains IDE で ESLint 8/9 相当として認識されるよう、パッケージバージョンを `9.0.0-proxy.1` に変更（実際のプロキシ機能の内部バージョンは `proxyVersion` で追跡）。
+- ESLint API ラップを刷新し、`loadESLint` を含む公式エクスポートを再公開して IDE 連携を修正。
+- レガシー `CLIEngine` パスにフォールバックせずに翻訳を適用できるよう、ESM/CJS 双方でプロキシクラスを動的生成。
+- JetBrains 互換を検証するユニットテストを追加。
+
 ## [0.1.0] - 2025-10-02
 
 ### Added

@@ -3,96 +3,157 @@
  * CommonJS 環境で使用するためのラッパー
  */
 
+import type { ESLint as ESLintType } from 'eslint';
+import type { LintMessage } from './translate.js';
+
+type ESLintModule = typeof import('eslint');
+type ESLintClass = ESLintModule['ESLint'];
+type ESLintLoadFn = (options?: { useFlatConfig?: boolean; cwd?: string }) => Promise<ESLintClass>;
+
+type MissingLoggerModule = {
+  bufferMissing?: (
+    ruleId: string,
+    messageId: LintMessage['messageId'],
+    message: string,
+    data?: Record<string, unknown>
+  ) => void;
+};
+
 // プロジェクトの eslint を直接使用
-function loadProjectESLint() {
+function loadProjectESLint(): ESLintModule {
   try {
-    // プロジェクトの cwd から eslint を解決
     const eslintPath = require.resolve('eslint', { paths: [process.cwd()] });
     return require(eslintPath);
-  } catch {
-    // フォールバック: このパッケージの eslint を使用
+  } catch (err) {
+    if (process.env.ESLINT_JA_DEBUG) {
+      console.error('[eslint-ja-proxy] Failed to load project ESLint (CJS), using fallback:', err);
+    }
     return require('eslint');
   }
 }
 
-const { ESLint: OriginalESLint, Linter } = loadProjectESLint();
+const eslintModule = loadProjectESLint();
+const { ESLint: OriginalESLint, Linter, RuleTester, SourceCode } = eslintModule;
+const originalLoadESLint: ESLintLoadFn | null =
+  typeof eslintModule.loadESLint === 'function'
+    ? (eslintModule.loadESLint as ESLintLoadFn).bind(eslintModule)
+    : null;
 
-// 辞書読み込み（同期的に行う必要がある）
-let dict: any = null;
-function getDictionary() {
-  if (!dict) {
-    // 簡易実装：辞書は最初のlint時にロードする
-    try {
-      const { getDictionary: loadDict } = require('./load-dict.js');
-      dict = loadDict();
-    } catch {
-      dict = {};
+const { getDictionary }: { getDictionary: () => Record<string, Record<string, string>> } = require('./load-dict.js');
+const { translateMessage }: { translateMessage: (message: LintMessage, dict: Record<string, any>) => LintMessage } =
+  require('./translate.js');
+
+let missingLoggerModule: MissingLoggerModule | null = null;
+let missingLoggerLoad: Promise<MissingLoggerModule | null> | null = null;
+
+function logMissing(ruleId: string, messageId: LintMessage['messageId'], message: string | undefined) {
+  if (!ruleId) {
+    return;
+  }
+
+  if (missingLoggerModule && typeof missingLoggerModule.bufferMissing === 'function') {
+    missingLoggerModule.bufferMissing(ruleId, messageId, message ?? '');
+    return;
+  }
+
+  if (!missingLoggerLoad) {
+    missingLoggerLoad = import('./missing-logger.js')
+      .then((mod) => {
+        const resolved = mod as MissingLoggerModule;
+        missingLoggerModule = resolved;
+        return resolved;
+      })
+      .catch(() => {
+        missingLoggerLoad = null;
+        return null;
+      });
+  }
+
+  const pending = missingLoggerLoad;
+  if (!pending) {
+    return;
+  }
+
+  pending.then((mod: MissingLoggerModule | null) => {
+    if (mod && typeof mod.bufferMissing === 'function') {
+      mod.bufferMissing(ruleId, messageId, message ?? '');
+    }
+  });
+}
+
+const proxyCache = new WeakMap<ESLintClass, ESLintClass>();
+
+function translateLintResults(results: ESLintType.LintResult[]): ESLintType.LintResult[] {
+  const dict = getDictionary();
+
+  return results.map((result) => {
+    const translatedMessages = result.messages.map((message) => {
+      const lintMsg = message as LintMessage;
+      const translated = translateMessage(lintMsg, dict);
+
+      if (translated === lintMsg && lintMsg?.ruleId) {
+        logMissing(lintMsg.ruleId, lintMsg.messageId, lintMsg.message);
+      }
+
+      return translated;
+    });
+
+    return {
+      ...result,
+      messages: translatedMessages,
+    };
+  });
+}
+
+function createProxyClass(Base: ESLintClass): ESLintClass {
+  if (proxyCache.has(Base)) {
+    return proxyCache.get(Base)!;
+  }
+
+  class ESLintProxy extends Base {
+    constructor(options?: ESLintType.Options) {
+      super({
+        ...options,
+        cwd: (options && options.cwd) || process.cwd(),
+      });
+    }
+
+    async lintFiles(patterns: string | string[]): Promise<ESLintType.LintResult[]> {
+      const results = await super.lintFiles(patterns);
+      return translateLintResults(results as ESLintType.LintResult[]);
+    }
+
+    async lintText(
+      code: string,
+      options?: Parameters<ESLintType['lintText']>[1]
+    ): Promise<ESLintType.LintResult[]> {
+      const results = await super.lintText(code, options);
+      return translateLintResults(results as ESLintType.LintResult[]);
     }
   }
-  return dict;
+
+  proxyCache.set(Base, ESLintProxy as unknown as ESLintClass);
+  return proxyCache.get(Base)!;
 }
 
-// 翻訳関数
-function translateMessages(messages: any[], dictionary: any) {
-  try {
-    const { translateMessages: translate } = require('./translate.js');
-    return translate(messages, dictionary);
-  } catch {
-    return messages;
-  }
-}
+const ESLintJaProxyCJS = createProxyClass(OriginalESLint as ESLintClass);
 
-// ESLint をラップしたクラス
-class ESLintJaProxyCJS extends OriginalESLint {
-  private _originalCwd: string;
-
-  constructor(options?: any) {
-    // 呼び出し時の cwd を保存
-    const cwd = options?.cwd || process.cwd();
-    super({
-      ...options,
-      cwd: cwd,
-    });
-    this._originalCwd = cwd;
-  }
-
-  async lintFiles(patterns: string | string[]): Promise<any> {
-    const results = await super.lintFiles(patterns);
-    return this.translateResults(results);
-  }
-
-  async lintText(code: string, options?: any): Promise<any> {
-    const results = await super.lintText(code, options);
-    return this.translateResults(results);
-  }
-
-  private translateResults(results: any[]): any[] {
-    const dictionary = getDictionary();
-
-    return results.map((result: any) => {
-      const translatedMessages = translateMessages(result.messages, dictionary);
-      return {
-        ...result,
-        messages: translatedMessages,
-      };
-    });
-  }
-
-  static get version(): string {
-    return OriginalESLint.version;
-  }
-
-  static async outputFixes(results: any[]): Promise<void> {
-    return OriginalESLint.outputFixes(results);
-  }
-
-  static async getErrorResults(results: any[]): Promise<any[]> {
-    return OriginalESLint.getErrorResults(results);
-  }
-}
-
-// CommonJS エクスポート
 module.exports = ESLintJaProxyCJS;
 module.exports.ESLint = ESLintJaProxyCJS;
 module.exports.default = ESLintJaProxyCJS;
 module.exports.Linter = Linter;
+if (RuleTester) {
+  module.exports.RuleTester = RuleTester;
+}
+if (SourceCode) {
+  module.exports.SourceCode = SourceCode;
+}
+
+module.exports.loadESLint = async function loadESLint(options?: Parameters<NonNullable<ESLintLoadFn>>[0]) {
+  if (!originalLoadESLint) {
+    return ESLintJaProxyCJS;
+  }
+
+  const LoadedESLint = await originalLoadESLint(options);
+  return createProxyClass(LoadedESLint as ESLintClass);
+};

@@ -1,6 +1,7 @@
 {
   "name": "eslint-ja-proxy",
-  "version": "0.1.0",
+  "version": "9.0.0-proxy.1",
+  "proxyVersion": "0.1.0",
   "description": "ESLintのエラーメッセージを日本語化するプロキシ",
   "type": "module",
   "main": "./dist/index.cjs",

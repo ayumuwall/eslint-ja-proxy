@@ -155,23 +155,30 @@ constructor(options) {
    ```
 
 5. **IDEはパッケージを認識している**
-   - IDE設定画面で「0.1.0」とバージョンが表示されている
-   - IDEログに「eslint-ja-proxy」の読み込み記録がある
+   - IDE設定画面で `9.0.0-proxy.1` と表示され、JetBrains 側で ESLint 8/9 相当として扱われる
+   - IDEログや `os.tmpdir()/eslint-ja-debug.log` に `loadProjectESLint` の呼び出しが記録される
+
+### 🆕 2025-10-02 追加調査メモ
+
+- JetBrains の ESLint 連携は `state.linterPackageVersion` の先頭メジャー値で使用するプラグインを切り替える（`javascript-plugin/languageService/eslint/src/eslint-plugin-provider.ts`）。メジャーが 8 以上の場合は `ESLint8Plugin`（ESLint Node API ベース）、それ未満は `ESLintPlugin`（旧 `CLIEngine` ベース）にフォールバックすることをコードから確認。
+- パッケージが `0.1.0` のままだと旧 `CLIEngine` 側に振り分けられ、`lib/api.CLIEngine` を直接 `require` するため ESLint 9 では `CLIEngine` が存在せず、IDE のエラー表示が「ESLint設定」のままになっていた。
+- `package.json` の `version` を `9.0.0-proxy.1` に引き上げると JetBrains が `ESLint8Plugin` を選択し、`ESLint` コンストラクタと `loadESLint` 経由で今回整備したプロキシの export が利用される。Semantic Versioning 的にも「ESLint 9 互換」という扱いができ、内部の独自バージョンは `proxyVersion` フィールドで追跡。
+- 仕様依存のため、将来 JetBrains 側の判定方法が変われば再追従が必要だが、現時点では仕様に基づく正攻法と判断。
+- `node_modules/eslint-ja-proxy/dist/index.cjs` にデバッグログを追加し、IDE 経由でも `loadProjectESLint` と翻訳処理が実行されていることを `eslint-ja-debug.log` で確認。
+- デバッグログ仕様: CommonJS エントリで `loadProjectESLint` 呼び出しと翻訳処理毎に `os.tmpdir()/eslint-ja-debug.log` へ追記（形式は `[eslint-ja-proxy] loadProjectESLint cwd=...` / `[translate] rule=... translated=...`）。CLI・IDE 双方で挙動確認や引き継ぎに利用可能（ファイルは `/var/folders/.../T/` 配下に生成）。
+- ただし IDE では `TypeError: this.LegacyESLint is not a constructor` が発生。JetBrains 側が `lib/unsupported-api.LegacyESLint` のコンストラクタ互換を期待しているため、プロキシ側で `LegacyESLint`／`FlatESLint` をラップして返す必要がある。
+- CLI で英語メッセージに戻るケースを確認。`node_modules/.bin/eslint` が本家を指す場合は `npx eslint-ja` を利用するか `"eslint": "npm:eslint-ja-proxy@…"` でエイリアス指定が必要。
 
 ### ❓ 不明な点
 
-1. **IDEがどのようにESLintを呼び出しているか**
-   - CLIを使っているのか？
-   - Node APIを使っているのか？
-   - どのタイミングで初期化しているのか？
+1. **JetBrains 側の `LegacyESLint` 互換 API の実装詳細**
+   - `ESLint8Plugin` が `require('../lib/unsupported-api').LegacyESLint` を期待しているため、プロキシで同じインターフェースを提供する方法を調査中。
 
-2. **IDEのESLint統合の具体的なエラー**
-   - 言語サービスに警告が出ているが、詳細なエラーメッセージが見えない
-   - IDEログにESLintのエラーが記録されていない
+2. **IDE でのエラー処理フロー**
+   - `LegacyESLint` が生成できないと `TypeError` でストップする。IDE 内で翻訳後メッセージを渡せるよう、エラーを解消する必要がある。
 
-3. **環境変数の渡し方**
-   - `ESLINT_JA_DEBUG=1` を設定しても、IDE経由では出力が見えない
-   - IDEからの実行時に環境変数が渡されているのか不明
+3. **JetBrains の ESLint 連携における CLI との使い分け**
+   - CLI バイナリの差し替え有無が IDE 判定へ影響するかを引き続き検証する。
 
 ## 次のステップの候補
 
@@ -262,5 +269,5 @@ eslint-ja-proxy/
 
 ---
 
-**最終更新**: 2025-10-02
-**ステータス**: IDEでの動作確認が必要
+**最終更新**: 2025-10-03
+**ステータス**: JetBrains `LegacyESLint` 互換実装を検討中
