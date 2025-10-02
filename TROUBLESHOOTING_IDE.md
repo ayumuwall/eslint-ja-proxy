@@ -3,7 +3,7 @@
 ## 現状の問題
 
 ### 症状
-- **JetBrains IDE (PhpStorm/WebStorm/IntelliJ)** で `eslint-ja-proxy` をESLintパッケージとして指定しても、警告が表示されない
+- **JetBrains IDE (PhpStorm/WebStorm/IntelliJ)** で `eslint-ja-proxy` をESLintパッケージとして指定しても、なにも表示されない
 - 右下の「言語サービス」にESLintの警告アイコンが表示されるが、エラー内容は「ESLint設定」とだけ表示
 - IDE上のエディタにはESLintの警告が一切表示されない
 
@@ -14,7 +14,7 @@
 
 ```bash
 # ✅ 動作する
-npx eslint-ja-proxy src/app/home/home.page.ts
+npx eslint-ja-proxy src/app/home/test.ts
 # → "空のライフサイクルメソッド '{methodName}' を削除してください。"
 
 # ✅ 動作する
@@ -22,7 +22,7 @@ node -e "
 (async () => {
   const eslint = require('eslint-ja-proxy');
   const instance = new eslint.ESLint();
-  const results = await instance.lintFiles(['src/app/home/home.page.ts']);
+  const results = await instance.lintFiles(['src/app/home/test.ts']);
   console.log(results[0].messages[0].message);
 })();
 "
