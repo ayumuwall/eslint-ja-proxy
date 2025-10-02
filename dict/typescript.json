@@ -1,0 +1,54 @@
+{
+  "@typescript-eslint/no-unused-vars": {
+    "unusedVar": "'{name}' は定義されていますが使用されていません。"
+  },
+  "@typescript-eslint/no-explicit-any": {
+    "unexpectedAny": "予期しない any 型です。代わりに具体的な型を指定してください。"
+  },
+  "@typescript-eslint/explicit-function-return-type": {
+    "missingReturnType": "関数 '{name}' の戻り値の型を明示してください。"
+  },
+  "@typescript-eslint/no-inferrable-types": {
+    "noInferrableType": "'{name}' の型は推論可能です。型注釈は不要です。"
+  },
+  "@typescript-eslint/ban-ts-comment": {
+    "tsDirectiveComment": "'{directive}' コメントを使用しないでください。説明が必要な場合は理由を記述してください。"
+  },
+  "@typescript-eslint/no-empty-interface": {
+    "noEmpty": "空のインターフェース '{name}' です。",
+    "noEmptyWithSuper": "空のインターフェース '{name}' で拡張のみを行っています。type エイリアスを使用してください。"
+  },
+  "@typescript-eslint/no-var-requires": {
+    "noVarReqs": "'require' 文の代わりに ES6 形式の import を使用してください。"
+  },
+  "@typescript-eslint/prefer-as-const": {
+    "preferAsConst": "型アサーションの代わりに 'as const' を使用してください。"
+  },
+  "@typescript-eslint/prefer-namespace-keyword": {
+    "useNamespace": "'module' キーワードの代わりに 'namespace' を使用してください。"
+  },
+  "@typescript-eslint/no-namespace": {
+    "noNamespace": "カスタム TypeScript モジュール/名前空間を使用しないでください。"
+  },
+  "@typescript-eslint/ban-types": {
+    "bannedTypeMessage": "型 '{name}' を使用しないでください。{customMessage}"
+  },
+  "@typescript-eslint/adjacent-overload-signatures": {
+    "adjacentSignature": "オーバーロードされたシグネチャ '{name}' は隣接している必要があります。"
+  },
+  "@typescript-eslint/array-type": {
+    "errorStringGeneric": "配列型は '{readonlyPrefix}Array<{type}>' ではなく '{readonlyPrefix}{type}[]' として記述してください。",
+    "errorStringArray": "配列型は '{type}[]' ではなく '{readonlyPrefix}Array<{type}>' として記述してください。"
+  },
+  "@typescript-eslint/consistent-type-definitions": {
+    "interfaceOverType": "型定義には type ではなく interface を使用してください。",
+    "typeOverInterface": "型定義には interface ではなく type を使用してください。"
+  },
+  "@typescript-eslint/no-non-null-assertion": {
+    "noNonNull": "非nullアサーション演算子 '!' の使用は禁止されています。"
+  },
+  "@typescript-eslint/prefer-optional-chain": {
+    "preferOptionalChain": "オプショナルチェーン '?.' を使用してください。",
+    "optionalChainSuggest": "オプショナルチェーンに変更してください。"
+  }
+}

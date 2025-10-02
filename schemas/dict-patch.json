@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/eslint-ja-proxy/schemas/dict-patch.json",
+  "title": "DictPatch",
+  "description": "辞書パッチファイル（PR 用フォーマット）",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["plugin", "versionRange", "entries"],
+  "properties": {
+    "plugin": {
+      "type": "string",
+      "minLength": 1,
+      "description": "対象プラグイン名（例: eslint, @angular-eslint/eslint-plugin, @typescript-eslint/eslint-plugin）"
+    },
+    "versionRange": {
+      "type": "string",
+      "minLength": 1,
+      "description": "適用するバージョン範囲（semver 形式、例: >=18 <20, *）"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "translation-entry.json"
+      },
+      "description": "翻訳エントリの配列"
+    }
+  }
+}

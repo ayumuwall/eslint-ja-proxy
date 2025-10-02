@@ -1,0 +1,52 @@
+{
+  "no-unused-vars": {
+    "unusedVar": "'{name}' は定義されていますが使用されていません。",
+    "unusedVarWithDetails": "'{name}' ({type}) は定義されていますが使用されていません。"
+  },
+  "no-undef": {
+    "undef": "'{name}' は定義されていません。"
+  },
+  "no-console": {
+    "unexpected": "予期しない console 文です。"
+  },
+  "semi": {
+    "missingSemi": "セミコロンがありません。",
+    "extraSemi": "不要なセミコロンです。"
+  },
+  "quotes": {
+    "wrongQuotes": "{description}を使用してください。"
+  },
+  "eqeqeq": {
+    "unexpected": "'{operator}' の代わりに '{expectedOperator}' を使用してください。"
+  },
+  "no-var": {
+    "unexpectedVar": "'var' の代わりに 'let' または 'const' を使用してください。"
+  },
+  "prefer-const": {
+    "useConst": "'{name}' は再代入されていません。'const' を使用してください。"
+  },
+  "no-const-assign": {
+    "const": "'{name}' は const 変数です。再代入できません。"
+  },
+  "no-dupe-keys": {
+    "unexpected": "オブジェクトリテラルで重複したキー '{name}' があります。"
+  },
+  "no-duplicate-case": {
+    "unexpected": "重複した case ラベルがあります。"
+  },
+  "no-unreachable": {
+    "unreachableCode": "到達不可能なコードです。"
+  },
+  "no-empty": {
+    "unexpected": "空のブロック文です。"
+  },
+  "curly": {
+    "missingCurlyAfter": "'{name}' の後に波括弧が必要です。",
+    "missingCurlyAfterCondition": "条件文の後に波括弧が必要です。"
+  },
+  "no-redeclare": {
+    "redeclared": "'{name}' は既に宣言されています。",
+    "redeclaredAsBuiltin": "'{name}' は既にビルトイン値として宣言されています。",
+    "redeclaredBySyntax": "'{name}' は既に構文として宣言されています。"
+  }
+}

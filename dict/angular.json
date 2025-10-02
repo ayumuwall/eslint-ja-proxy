@@ -1,0 +1,39 @@
+{
+  "@angular-eslint/template/i18n": {
+    "textRequiresI18n": "テキストコンテンツには i18n 属性が必要です。",
+    "missingI18nAttr": "要素に i18n 属性がありません。"
+  },
+  "@angular-eslint/template/no-negated-async": {
+    "noNegatedAsync": "async パイプの結果を否定しないでください。代わりに別のパイプを使用してください。"
+  },
+  "@angular-eslint/component-class-suffix": {
+    "suffixRequired": "コンポーネントクラス名は '{suffixes}' で終わる必要があります。"
+  },
+  "@angular-eslint/directive-class-suffix": {
+    "suffixRequired": "ディレクティブクラス名は '{suffixes}' で終わる必要があります。"
+  },
+  "@angular-eslint/no-empty-lifecycle-method": {
+    "noEmptyLifecycleMethod": "空のライフサイクルメソッド '{methodName}' を削除してください。"
+  },
+  "@angular-eslint/no-input-rename": {
+    "noInputRename": "@Input() プロパティ '{propertyName}' の名前を変更しないでください。"
+  },
+  "@angular-eslint/no-output-rename": {
+    "noOutputRename": "@Output() プロパティ '{propertyName}' の名前を変更しないでください。"
+  },
+  "@angular-eslint/use-lifecycle-interface": {
+    "useLifecycleInterface": "ライフサイクルメソッド '{methodName}' を実装する場合は、対応するインターフェース '{interfaceName}' を実装してください。"
+  },
+  "@angular-eslint/template/banana-in-box": {
+    "bananaInBox": "無効なバインディング構文です。'([])' の代わりに '[()]' を使用してください。"
+  },
+  "@angular-eslint/template/eqeqeq": {
+    "useStrictEquality": "'{operator}' の代わりに '{expectedOperator}' を使用してください。"
+  },
+  "@angular-eslint/template/no-any": {
+    "noAny": "テンプレートで '$any' を使用しないでください。"
+  },
+  "@angular-eslint/template/no-duplicate-attributes": {
+    "noDuplicateAttributes": "属性 '{attributeName}' が重複しています。"
+  }
+}

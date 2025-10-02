@@ -1,5 +1,7 @@
 # eslint-ja-proxy
 
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 ESLint のエラーメッセージを **日本語**にします。  
 JetBrains（WebStorm/IntelliJ）、VS Code、CLI/CI など **ESLint を使う場所ならどこでも**動きます。
 
@@ -120,5 +122,4 @@ A. 未訳のときは英語になります。使いながら徐々に辞書を�
 
 ## ライセンス
 MIT
-
 
