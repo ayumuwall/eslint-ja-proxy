@@ -29,8 +29,16 @@
     "i18n",
     "translate"
   ],
-  "author": "",
+  "author": "Ayumu Magoshi",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayumuwall/eslint-ja-proxy.git"
+  },
+  "homepage": "https://github.com/ayumuwall/eslint-ja-proxy#readme",
+  "bugs": {
+    "url": "https://github.com/ayumuwall/eslint-ja-proxy/issues"
+  },
   "engines": {
     "node": ">=18"
   },
