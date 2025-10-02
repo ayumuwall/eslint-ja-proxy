@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "ESLintのエラーメッセージを日本語化するプロキシ",
   "type": "module",
+  "main": "./dist/index.cjs",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
@@ -11,6 +12,7 @@
     "./register": "./dist/register.cjs"
   },
   "bin": {
+    "eslint": "./dist/cli.mjs",
     "eslint-ja": "./dist/cli.mjs"
   },
   "files": [
