@@ -2,23 +2,15 @@
  * ESLint メッセージを日本語に翻訳する
  */
 
+import type { Linter } from 'eslint';
+
 export interface TranslationDict {
   [ruleId: string]: {
     [messageId: string]: string;
   };
 }
 
-export interface LintMessage {
-  ruleId: string | null;
-  messageId?: string;
-  message: string;
-  line?: number;
-  column?: number;
-  endLine?: number;
-  endColumn?: number;
-  severity: number;
-  [key: string]: any;
-}
+export type LintMessage = Linter.LintMessage;
 
 /**
  * テンプレート文字列内のプレースホルダを data で置換

@@ -1,5 +1,8 @@
 # eslint-ja-proxy
 
+[![CI](https://github.com/ayumuwall/eslint-ja-proxy/actions/workflows/ci.yml/badge.svg)](https://github.com/ayumuwall/eslint-ja-proxy/actions/workflows/ci.yml)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/ayumuwall/eslint-ja-proxy/ci.yml?branch=main&label=tests)](https://github.com/ayumuwall/eslint-ja-proxy/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/eslint-ja-proxy.svg)](https://www.npmjs.com/package/eslint-ja-proxy)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ESLint のエラーメッセージを **日本語**にします。  
@@ -122,4 +125,3 @@ A. 未訳のときは英語になります。使いながら徐々に辞書を�
 
 ## ライセンス
 MIT
-
