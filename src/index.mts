@@ -3,7 +3,33 @@
  * ESLint をラップして結果を日本語化する
  */
 
-import { ESLint } from 'eslint';
+import { createRequire } from 'module';
+import type { ESLint as ESLintType } from 'eslint';
+
+const require = createRequire(import.meta.url);
+
+// プロジェクトの eslint を使用（cwd から解決）
+function loadProjectESLint() {
+  try {
+    // プロジェクトの cwd から eslint を解決
+    const eslintPath = require.resolve('eslint', { paths: [process.cwd()] });
+    // デバッグ: どのESLintを読み込んでいるか確認
+    if (process.env.ESLINT_JA_DEBUG) {
+      console.error('[eslint-ja-proxy] Loading ESLint from:', eslintPath);
+      console.error('[eslint-ja-proxy] CWD:', process.cwd());
+    }
+    return require(eslintPath);
+  } catch (err) {
+    // フォールバック: このパッケージの eslint を使用
+    if (process.env.ESLINT_JA_DEBUG) {
+      console.error('[eslint-ja-proxy] Failed to load project ESLint, using fallback:', err);
+    }
+    return require('eslint');
+  }
+}
+
+const { ESLint } = loadProjectESLint() as { ESLint: typeof ESLintType };
+
 import { getDictionary } from './load-dict.js';
 import { translateMessages } from './translate.js';
 import { bufferMissing } from './missing-logger.js';
@@ -13,14 +39,18 @@ import type { LintMessage } from './translate.js';
  * ESLint をラップしたクラス
  */
 export class ESLintJaProxy extends ESLint {
-  constructor(options?: ESLint.Options) {
-    super(options);
+  constructor(options?: ESLintType.Options) {
+    // cwd が指定されていない場合はプロセスの cwd を使用
+    super({
+      ...options,
+      cwd: options?.cwd || process.cwd(),
+    });
   }
 
   /**
    * lintFiles をオーバーライド
    */
-  async lintFiles(patterns: string | string[]): Promise<ESLint.LintResult[]> {
+  async lintFiles(patterns: string | string[]): Promise<ESLintType.LintResult[]> {
     const results = await super.lintFiles(patterns);
     return this.translateResults(results);
   }
@@ -31,7 +61,7 @@ export class ESLintJaProxy extends ESLint {
   async lintText(
     code: string,
     options?: { filePath?: string; warnIgnored?: boolean }
-  ): Promise<ESLint.LintResult[]> {
+  ): Promise<ESLintType.LintResult[]> {
     const results = await super.lintText(code, options);
     return this.translateResults(results);
   }
@@ -39,7 +69,7 @@ export class ESLintJaProxy extends ESLint {
   /**
    * 結果を翻訳
    */
-  private translateResults(results: ESLint.LintResult[]): ESLint.LintResult[] {
+  private translateResults(results: ESLintType.LintResult[]): ESLintType.LintResult[] {
     const dict = getDictionary();
 
     return results.map((result) => {

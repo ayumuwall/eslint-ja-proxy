@@ -3,71 +3,91 @@
  * CommonJS 環境で使用するためのラッパー
  */
 
-// ESM モジュールを動的にインポート
-let ESLintJaProxy: any = null;
-
-async function loadESM() {
-  if (!ESLintJaProxy) {
-    const mod = await import('./index.mjs');
-    ESLintJaProxy = mod.default || mod.ESLintJaProxy;
+// プロジェクトの eslint を直接使用
+function loadProjectESLint() {
+  try {
+    // プロジェクトの cwd から eslint を解決
+    const eslintPath = require.resolve('eslint', { paths: [process.cwd()] });
+    return require(eslintPath);
+  } catch {
+    // フォールバック: このパッケージの eslint を使用
+    return require('eslint');
   }
-  return ESLintJaProxy;
 }
 
-// 同期的なエクスポート用のプロキシ
-class ESLintJaProxyCJS {
-  private _instance: any = null;
+const { ESLint: OriginalESLint, Linter } = loadProjectESLint();
+
+// 辞書読み込み（同期的に行う必要がある）
+let dict: any = null;
+function getDictionary() {
+  if (!dict) {
+    // 簡易実装：辞書は最初のlint時にロードする
+    try {
+      const { getDictionary: loadDict } = require('./load-dict.js');
+      dict = loadDict();
+    } catch {
+      dict = {};
+    }
+  }
+  return dict;
+}
+
+// 翻訳関数
+function translateMessages(messages: any[], dictionary: any) {
+  try {
+    const { translateMessages: translate } = require('./translate.js');
+    return translate(messages, dictionary);
+  } catch {
+    return messages;
+  }
+}
+
+// ESLint をラップしたクラス
+class ESLintJaProxyCJS extends OriginalESLint {
+  private _originalCwd: string;
 
   constructor(options?: any) {
-    // 初期化は非同期で行う必要があるため、後で実行
-    this._initPromise = this._init(options);
-  }
-
-  private _initPromise: Promise<void>;
-
-  private async _init(options?: any) {
-    const ESLintClass = await loadESM();
-    this._instance = new ESLintClass(options);
+    // 呼び出し時の cwd を保存
+    const cwd = options?.cwd || process.cwd();
+    super({
+      ...options,
+      cwd: cwd,
+    });
+    this._originalCwd = cwd;
   }
 
   async lintFiles(patterns: string | string[]): Promise<any> {
-    await this._initPromise;
-    return this._instance.lintFiles(patterns);
+    const results = await super.lintFiles(patterns);
+    return this.translateResults(results);
   }
 
   async lintText(code: string, options?: any): Promise<any> {
-    await this._initPromise;
-    return this._instance.lintText(code, options);
+    const results = await super.lintText(code, options);
+    return this.translateResults(results);
   }
 
-  async loadFormatter(nameOrPath?: string): Promise<any> {
-    await this._initPromise;
-    return this._instance.loadFormatter(nameOrPath);
-  }
+  private translateResults(results: any[]): any[] {
+    const dictionary = getDictionary();
 
-  async calculateConfigForFile(filePath: string): Promise<any> {
-    await this._initPromise;
-    return this._instance.calculateConfigForFile(filePath);
-  }
-
-  async isPathIgnored(filePath: string): Promise<any> {
-    await this._initPromise;
-    return this._instance.isPathIgnored(filePath);
+    return results.map((result: any) => {
+      const translatedMessages = translateMessages(result.messages, dictionary);
+      return {
+        ...result,
+        messages: translatedMessages,
+      };
+    });
   }
 
   static get version(): string {
-    const { ESLint } = require('eslint');
-    return ESLint.version;
+    return OriginalESLint.version;
   }
 
   static async outputFixes(results: any[]): Promise<void> {
-    const { ESLint } = require('eslint');
-    return ESLint.outputFixes(results);
+    return OriginalESLint.outputFixes(results);
   }
 
   static async getErrorResults(results: any[]): Promise<any[]> {
-    const { ESLint } = require('eslint');
-    return ESLint.getErrorResults(results);
+    return OriginalESLint.getErrorResults(results);
   }
 }
 
@@ -75,7 +95,4 @@ class ESLintJaProxyCJS {
 module.exports = ESLintJaProxyCJS;
 module.exports.ESLint = ESLintJaProxyCJS;
 module.exports.default = ESLintJaProxyCJS;
-
-// Linter も再エクスポート
-const { Linter } = require('eslint');
 module.exports.Linter = Linter;

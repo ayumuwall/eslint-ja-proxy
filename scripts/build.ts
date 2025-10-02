@@ -41,6 +41,10 @@ copyDirectory(DICT_DIR, join(DIST_DIR, 'dict'));
 console.log('\n📋 スキーマファイルをコピー中...');
 copyDirectory(SCHEMAS_DIR, join(DIST_DIR, 'schemas'));
 
+// CLI に実行権限を付与
+console.log('\n🔐 CLI に実行権限を付与中...');
+execSync('chmod +x dist/cli.mjs', { stdio: 'inherit' });
+
 console.log('\n✅ ビルド完了！');
 console.log(`\n出力ディレクトリ: ${DIST_DIR}`);
 
