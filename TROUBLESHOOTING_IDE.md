@@ -1,6 +1,17 @@
 # IDEでESLintが動作しない問題の調査記録
 
-## 現状の問題
+## 目次
+- [現状の問題](#issue-overview)
+- [試したこと](#attempt-log)
+- [どこまで原因を特定できたか](#findings)
+  - [✅ 確認できたこと](#verified-points)
+  - [🔍 今後の確認ポイント](#followups)
+- [🗒 追加メモ（2025-10-03 時点）](#notes-20251003)
+- [次のステップの候補](#next-steps)
+- [テスト環境情報](#env-info)
+
+
+## 現状の問題 <a id="issue-overview"></a>
 
 ### 症状
 - **JetBrains IDE (PhpStorm/WebStorm/IntelliJ)** で `eslint-ja-proxy` をESLintパッケージとして指定しても、なにも表示されない
@@ -29,7 +40,7 @@ node -e "
 # → "空のライフサイクルメソッド '{methodName}' を削除してください。"
 ```
 
-## 試したこと
+## 試したこと <a id="attempt-log"></a>
 
 ### 1. IDEの設定確認
 - **ESLintパッケージ**: `~/SynologyDrive/Dev/eslint-ja-proxy` を指定（npm linkで接続済み）
@@ -129,9 +140,9 @@ constructor(options) {
 - **実行権限の自動付与**: `chmod +x dist/cli.mjs` をビルドスクリプトに追加
 - **npm link**: 開発版とテストプロジェクトをシンボリックリンクで接続
 
-## どこまで原因を特定できたか
+## どこまで原因を特定できたか <a id="findings"></a>
 
-### ✅ 確認できたこと
+### ✅ 確認できたこと <a id="verified-points"></a>
 
 1. **パッケージ構造は正しい**
    ```bash
@@ -169,7 +180,8 @@ constructor(options) {
 - `TypeError: this.LegacyESLint is not a constructor` は、JetBrains 側が `../lib/unsupported-api` を相対参照していることに起因。`dist/lib/unsupported-api.{js,mjs}` とリポジトリ直下の `lib/unsupported-api.{js,mjs}` をビルド時に生成し、プロキシ済みクラスをエクスポートすることで解消した。
 - CLI で英語メッセージに戻るケースを確認。`node_modules/.bin/eslint` が本家を指す場合は `npx eslint-ja` を利用するか `"eslint": "npm:eslint-ja-proxy@…"` でエイリアス指定が必要。
 
-### ❓ 今後の確認ポイント
+<a id="anchor1"></a>
+### 🔍 今後の確認ポイント <a id="followups"></a>
 
 1. **辞書プレースホルダのカバレッジ**
    - `message.data` が提供されないルール（例: `@angular-eslint/no-empty-lifecycle-method`）は、英語メッセージに合わせた定型文へ調整済み。追加ルールでも `pnpm exec eslint <file> --format json` で `data` を確認すること。
@@ -177,7 +189,7 @@ constructor(options) {
 2. **ログ出力の活用**
    - CLI で `ESLINT_JA_DEBUG=1 node …` を実行すると `[eslint-ja-proxy] translateMessage …` が `stderr` に出力される。PhpStorm では `stderr` が `idea.log` に流れないため、必要に応じて CLI での再現やファイル出力を検討する。
 
-## 追加メモ（2025-10-03 時点）
+### 　 2025-10-03 追加調査メモ
 
 - ビルド後の成果物に `lib/unsupported-api.{js,mjs}` を含めることで JetBrains からの `require('../lib/unsupported-api')` が成功する。
 - `pnpm build` 後は IDE を再起動し、`ESLINT_JA_DEBUG=1 open -a PhpStorm` でログを取得可能。ログ監視は `tail -f ~/Library/Logs/JetBrains/PhpStorm*/idea.log` を推奨（`grep` フィルタは不要）。
