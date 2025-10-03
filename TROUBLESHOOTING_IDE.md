@@ -166,60 +166,34 @@ constructor(options) {
 - 仕様依存のため、将来 JetBrains 側の判定方法が変われば再追従が必要だが、現時点では仕様に基づく正攻法と判断。
 - `node_modules/eslint-ja-proxy/dist/index.cjs` にデバッグログを追加し、IDE 経由でも `loadProjectESLint` と翻訳処理が実行されていることを `eslint-ja-debug.log` で確認。
 - デバッグログ仕様: CommonJS エントリで `loadProjectESLint` 呼び出しと翻訳処理毎に `os.tmpdir()/eslint-ja-debug.log` へ追記（形式は `[eslint-ja-proxy] loadProjectESLint cwd=...` / `[translate] rule=... translated=...`）。CLI・IDE 双方で挙動確認や引き継ぎに利用可能（ファイルは `/var/folders/.../T/` 配下に生成）。
-- ただし IDE では `TypeError: this.LegacyESLint is not a constructor` が発生。JetBrains 側が `lib/unsupported-api.LegacyESLint` のコンストラクタ互換を期待しているため、プロキシ側で `LegacyESLint`／`FlatESLint` をラップして返す必要がある。
+- `TypeError: this.LegacyESLint is not a constructor` は、JetBrains 側が `../lib/unsupported-api` を相対参照していることに起因。`dist/lib/unsupported-api.{js,mjs}` とリポジトリ直下の `lib/unsupported-api.{js,mjs}` をビルド時に生成し、プロキシ済みクラスをエクスポートすることで解消した。
 - CLI で英語メッセージに戻るケースを確認。`node_modules/.bin/eslint` が本家を指す場合は `npx eslint-ja` を利用するか `"eslint": "npm:eslint-ja-proxy@…"` でエイリアス指定が必要。
 
-### ❓ 不明な点
+### ❓ 今後の確認ポイント
 
-1. **JetBrains 側の `LegacyESLint` 互換 API の実装詳細**
-   - `ESLint8Plugin` が `require('../lib/unsupported-api').LegacyESLint` を期待しているため、プロキシで同じインターフェースを提供する方法を調査中。
+1. **辞書プレースホルダのカバレッジ**
+   - `message.data` が提供されないルール（例: `@angular-eslint/no-empty-lifecycle-method`）は、英語メッセージに合わせた定型文へ調整済み。追加ルールでも `pnpm exec eslint <file> --format json` で `data` を確認すること。
 
-2. **IDE でのエラー処理フロー**
-   - `LegacyESLint` が生成できないと `TypeError` でストップする。IDE 内で翻訳後メッセージを渡せるよう、エラーを解消する必要がある。
+2. **ログ出力の活用**
+   - CLI で `ESLINT_JA_DEBUG=1 node …` を実行すると `[eslint-ja-proxy] translateMessage …` が `stderr` に出力される。PhpStorm では `stderr` が `idea.log` に流れないため、必要に応じて CLI での再現やファイル出力を検討する。
 
-3. **JetBrains の ESLint 連携における CLI との使い分け**
-   - CLI バイナリの差し替え有無が IDE 判定へ影響するかを引き続き検証する。
+## 追加メモ（2025-10-03 時点）
 
-## 次のステップの候補
+- ビルド後の成果物に `lib/unsupported-api.{js,mjs}` を含めることで JetBrains からの `require('../lib/unsupported-api')` が成功する。
+- `pnpm build` 後は IDE を再起動し、`ESLINT_JA_DEBUG=1 open -a PhpStorm` でログを取得可能。ログ監視は `tail -f ~/Library/Logs/JetBrains/PhpStorm*/idea.log` を推奨（`grep` フィルタは不要）。
+- CLI からデバッグする場合の例:
+  ```bash
+  ESLINT_JA_DEBUG=1 node - <<'NODE'
+  const { ESLint } = require('eslint-ja-proxy');
+  (async () => {
+    const eslint = new ESLint({ cwd: process.cwd() });
+    const [result] = await eslint.lintText('const foo = 1;\n');
+    console.log(result.messages);
+  })();
+  NODE
+  ```
 
-### A. IDEのログ・デバッグ情報を収集
-1. **IDEのDebug Log Settingsを有効化**
-   ```
-   Help > Diagnostic Tools > Debug Log Settings
-   #com.intellij.lang.javascript.linter.eslint
-   ```
-
-2. **IDEのESLintサービスのログを確認**
-   ```bash
-   tail -f ~/Library/Logs/JetBrains/PhpStorm*/idea.log | grep -i eslint
-   ```
-
-3. **言語サービスの警告アイコンをクリック**して、詳細なエラーメッセージを確認
-
-### B. 最小限の再現環境を作成
-1. **新規プロジェクトで最小構成をテスト**
-   ```bash
-   mkdir test-eslint-ja-proxy
-   cd test-eslint-ja-proxy
-   npm init -y
-   npm i -D eslint
-   npx eslint --init
-   npm link eslint-ja-proxy
-   ```
-
-2. **IDEで開いて動作確認**
-
-### C. JetBrains公式のESLint統合仕様を確認
-- JetBrainsのドキュメントで、カスタムESLintパッケージの要件を確認
-- 必須のエクスポート、メソッド、プロパティがあるか調査
-
-### D. VS Codeでテスト
-- VS CodeのESLint拡張でも同じ問題が発生するか確認
-- VS Codeで動作すれば、JetBrains特有の問題として切り分けられる
-
-### E. 既存のESLintラッパーを参考にする
-- 他のESLintラッパープロジェクト（例: `@rushstack/eslint-patch`）の実装を参考にする
-- IDEで動作しているラッパーがどのような実装になっているか調査
+**ステータス**: JetBrains `LegacyESLint` 互換は対応済み。IDE で警告が表示され、翻訳も適用されることを確認。
 
 ## テスト環境情報
 

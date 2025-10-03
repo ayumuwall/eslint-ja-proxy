@@ -10,7 +10,11 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
-    "./register": "./dist/register.cjs"
+    "./register": "./dist/register.cjs",
+    "./use-at-your-own-risk": {
+      "import": "./dist/use-at-your-own-risk.mjs",
+      "require": "./dist/use-at-your-own-risk.cjs"
+    }
   },
   "bin": {
     "eslint": "./dist/cli.mjs",
@@ -19,7 +23,8 @@
   "files": [
     "dist",
     "dict",
-    "schemas"
+    "schemas",
+    "lib"
   ],
   "scripts": {
     "build": "tsx scripts/build.ts",

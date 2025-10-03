@@ -4,7 +4,7 @@
  */
 
 import { execSync } from 'child_process';
-import { copyFileSync, mkdirSync, readdirSync, statSync } from 'fs';
+import { copyFileSync, mkdirSync, readdirSync, statSync, writeFileSync, rmSync } from 'fs';
 import { join } from 'path';
 
 const ROOT = process.cwd();
@@ -12,6 +12,8 @@ const SRC_DIR = join(ROOT, 'src');
 const DIST_DIR = join(ROOT, 'dist');
 const DICT_DIR = join(ROOT, 'dict');
 const SCHEMAS_DIR = join(ROOT, 'schemas');
+const COMPAT_LIB_DIR = join(DIST_DIR, 'lib');
+const ROOT_COMPAT_LIB_DIR = join(ROOT, 'lib');
 
 console.log('🔨 ビルド開始...\n');
 
@@ -44,6 +46,10 @@ copyDirectory(SCHEMAS_DIR, join(DIST_DIR, 'schemas'));
 // CLI に実行権限を付与
 console.log('\n🔐 CLI に実行権限を付与中...');
 execSync('chmod +x dist/cli.mjs', { stdio: 'inherit' });
+
+// JetBrains 等が期待する互換パスを生成
+console.log('\n🧩 互換用 shim を生成中...');
+createUnsupportedApiShim();
 
 console.log('\n✅ ビルド完了！');
 console.log(`\n出力ディレクトリ: ${DIST_DIR}`);
@@ -87,4 +93,27 @@ function renameExtensions(dir: string) {
       execSync(`mv "${fullPath}" "${newPath}"`);
     }
   }
+}
+
+/**
+ * JetBrains ESLint8Plugin が参照する ../lib/unsupported-api を提供
+ */
+function createUnsupportedApiShim() {
+  mkdirSync(COMPAT_LIB_DIR, { recursive: true });
+  mkdirSync(ROOT_COMPAT_LIB_DIR, { recursive: true });
+
+  const cjsShim = "module.exports = require('../use-at-your-own-risk.cjs');\n";
+  const esmShim = `import * as mod from '../use-at-your-own-risk.mjs';\nexport * from '../use-at-your-own-risk.mjs';\nexport default mod.default ?? mod;\n`;
+  const packageJson = JSON.stringify({ type: 'commonjs' }, null, 2);
+
+  writeFileSync(join(COMPAT_LIB_DIR, 'unsupported-api.js'), cjsShim);
+  writeFileSync(join(COMPAT_LIB_DIR, 'unsupported-api.mjs'), esmShim);
+  writeFileSync(join(COMPAT_LIB_DIR, 'package.json'), `${packageJson}\n`);
+
+  const rootCjsShim = "module.exports = require('../dist/use-at-your-own-risk.cjs');\n";
+  const rootEsmShim = `import * as mod from '../dist/use-at-your-own-risk.mjs';\nexport * from '../dist/use-at-your-own-risk.mjs';\nexport default mod.default ?? mod;\n`;
+
+  writeFileSync(join(ROOT_COMPAT_LIB_DIR, 'unsupported-api.js'), rootCjsShim);
+  writeFileSync(join(ROOT_COMPAT_LIB_DIR, 'unsupported-api.mjs'), rootEsmShim);
+  writeFileSync(join(ROOT_COMPAT_LIB_DIR, 'package.json'), `${packageJson}\n`);
 }

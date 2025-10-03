@@ -5,7 +5,7 @@
  */
 
 import { ESLint } from 'eslint';
-import { ESLintJaProxy } from './index.mjs';
+import { ESLint as ESLintJaProxy } from './index.mjs';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -94,8 +94,8 @@ Examples:
     console.log(output);
 
     // エラーがある場合は終了コード1
-    const hasErrors = results.some((result) =>
-      result.messages.some((msg: any) => msg.severity === 2)
+    const hasErrors = results.some((result: ESLint.LintResult) =>
+      result.messages.some((msg) => msg.severity === 2)
     );
 
     process.exit(hasErrors ? 1 : 0);

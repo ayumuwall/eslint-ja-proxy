@@ -45,8 +45,22 @@ export function translateMessage(
     return message;
   }
 
+  const payload = data ?? (message as { data?: Record<string, any> }).data ?? {};
+  if (process.env.ESLINT_JA_DEBUG) {
+    try {
+      const preview = Object.entries(payload)
+        .map(([k, v]) => `${k}=${String(v)}`)
+        .join(', ');
+      console.error(
+        `[eslint-ja-proxy] translateMessage rule=${message.ruleId} message=${message.message} payload=${preview}`
+      );
+    } catch {
+      // ignore logging errors
+    }
+  }
+
   // テンプレートを data で置換
-  const translatedMessage = replacePlaceholders(template, data);
+  const translatedMessage = replacePlaceholders(template, payload);
 
   // message のみを書き換える（他のフィールドは変更しない）
   return {
@@ -66,7 +80,7 @@ export function translateMessages(
     // ESLint が message に埋め込んだ data を抽出する試み
     // 実際の data は message オブジェクトの外に出ている場合もあるが、
     // ここでは messageId ベースの翻訳を優先する
-    return translateMessage(msg, dict);
+    return translateMessage(msg, dict, (msg as { data?: Record<string, any> }).data);
   });
 }
 

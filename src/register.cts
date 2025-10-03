@@ -22,7 +22,8 @@ async function loadProxy() {
   try {
     // ESM版を動的にインポート
     const mod = await import('./index.mjs');
-    ESLintJaProxyClass = mod.default || mod.ESLintJaProxy;
+    const defaultExport = (mod?.default ?? {}) as { ESLint?: any };
+    ESLintJaProxyClass = mod.ESLint || defaultExport.ESLint;
     proxyLoaded = true;
   } catch (err) {
     console.error('[eslint-ja-proxy] Failed to load proxy:', err);

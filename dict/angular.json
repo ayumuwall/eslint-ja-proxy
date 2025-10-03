@@ -13,7 +13,7 @@
     "suffixRequired": "ディレクティブクラス名は '{suffixes}' で終わる必要があります。"
   },
   "@angular-eslint/no-empty-lifecycle-method": {
-    "noEmptyLifecycleMethod": "空のライフサイクルメソッド '{methodName}' を削除してください。"
+    "noEmptyLifecycleMethod": "ライフサイクルメソッドを空のままにしないでください。"
   },
   "@angular-eslint/no-input-rename": {
     "noInputRename": "@Input() プロパティ '{propertyName}' の名前を変更しないでください。"

@@ -1,14 +1,15 @@
 /**
  * ESLint の CJS エントリポイント
- * CommonJS 環境で使用するためのラッパー
+ * JetBrains など既存ツールと互換な API 形状を維持しつつ
+ * lint 結果のメッセージを日本語に翻訳する
  */
 
 import type { ESLint as ESLintType } from 'eslint';
 import type { LintMessage } from './translate.js';
+import type { ESLintLikeConstructor } from './eslint-proxy-core.js';
 
 type ESLintModule = typeof import('eslint');
-type ESLintClass = ESLintModule['ESLint'];
-type ESLintLoadFn = (options?: { useFlatConfig?: boolean; cwd?: string }) => Promise<ESLintClass>;
+type UnsupportedApiModule = typeof import('eslint/use-at-your-own-risk');
 
 type MissingLoggerModule = {
   bufferMissing?: (
@@ -19,29 +20,39 @@ type MissingLoggerModule = {
   ) => void;
 };
 
-// プロジェクトの eslint を直接使用
-function loadProjectESLint(): ESLintModule {
+function loadProjectModule<T>(specifier: string): T | null {
   try {
-    const eslintPath = require.resolve('eslint', { paths: [process.cwd()] });
-    return require(eslintPath);
+    const resolved = require.resolve(specifier, { paths: [process.cwd()] });
+    return require(resolved) as T;
   } catch (err) {
     if (process.env.ESLINT_JA_DEBUG) {
-      console.error('[eslint-ja-proxy] Failed to load project ESLint (CJS), using fallback:', err);
+      console.error(`[eslint-ja-proxy] Failed to resolve ${specifier} from project`, err);
     }
-    return require('eslint');
+    try {
+      return require(specifier) as T;
+    } catch (fallbackErr) {
+      if (process.env.ESLINT_JA_DEBUG) {
+        console.error(`[eslint-ja-proxy] Failed to fallback require for ${specifier}`, fallbackErr);
+      }
+      return null;
+    }
   }
 }
 
-const eslintModule = loadProjectESLint();
-const { ESLint: OriginalESLint, Linter, RuleTester, SourceCode } = eslintModule;
-const originalLoadESLint: ESLintLoadFn | null =
+const eslintModule = (loadProjectModule<ESLintModule>('eslint') ?? require('eslint')) as ESLintModule;
+const unsupportedModule = loadProjectModule<UnsupportedApiModule>('eslint/use-at-your-own-risk');
+
+const { Linter, RuleTester, SourceCode } = eslintModule;
+const OriginalESLint = eslintModule.ESLint as ESLintLikeConstructor | undefined;
+const originalLoadESLint =
   typeof eslintModule.loadESLint === 'function'
-    ? (eslintModule.loadESLint as ESLintLoadFn).bind(eslintModule)
+    ? (eslintModule.loadESLint as ESLintModule['loadESLint']).bind(eslintModule)
     : null;
 
-const { getDictionary }: { getDictionary: () => Record<string, Record<string, string>> } = require('./load-dict.js');
-const { translateMessage }: { translateMessage: (message: LintMessage, dict: Record<string, any>) => LintMessage } =
-  require('./translate.js');
+const OriginalFlatESLint = (unsupportedModule?.FlatESLint ?? null) as ESLintLikeConstructor | null;
+const OriginalLegacyESLint = (unsupportedModule?.LegacyESLint ?? null) as ESLintLikeConstructor | null;
+
+const { createProxyHelpers } = require('./eslint-proxy-core.js');
 
 let missingLoggerModule: MissingLoggerModule | null = null;
 let missingLoggerLoad: Promise<MissingLoggerModule | null> | null = null;
@@ -81,79 +92,46 @@ function logMissing(ruleId: string, messageId: LintMessage['messageId'], message
   });
 }
 
-const proxyCache = new WeakMap<ESLintClass, ESLintClass>();
+const { createProxyClass } = createProxyHelpers(logMissing);
 
-function translateLintResults(results: ESLintType.LintResult[]): ESLintType.LintResult[] {
-  const dict = getDictionary();
+const ESLintProxy = OriginalESLint ? createProxyClass(OriginalESLint) : null;
+const FlatESLintProxy = OriginalFlatESLint ? createProxyClass(OriginalFlatESLint) : null;
+const LegacyESLintProxy = OriginalLegacyESLint ? createProxyClass(OriginalLegacyESLint) : null;
 
-  return results.map((result) => {
-    const translatedMessages = result.messages.map((message) => {
-      const lintMsg = message as LintMessage;
-      const translated = translateMessage(lintMsg, dict);
-
-      if (translated === lintMsg && lintMsg?.ruleId) {
-        logMissing(lintMsg.ruleId, lintMsg.messageId, lintMsg.message);
-      }
-
-      return translated;
-    });
-
-    return {
-      ...result,
-      messages: translatedMessages,
-    };
-  });
-}
-
-function createProxyClass(Base: ESLintClass): ESLintClass {
-  if (proxyCache.has(Base)) {
-    return proxyCache.get(Base)!;
-  }
-
-  class ESLintProxy extends Base {
-    constructor(options?: ESLintType.Options) {
-      super({
-        ...options,
-        cwd: (options && options.cwd) || process.cwd(),
-      });
-    }
-
-    async lintFiles(patterns: string | string[]): Promise<ESLintType.LintResult[]> {
-      const results = await super.lintFiles(patterns);
-      return translateLintResults(results as ESLintType.LintResult[]);
-    }
-
-    async lintText(
-      code: string,
-      options?: Parameters<ESLintType['lintText']>[1]
-    ): Promise<ESLintType.LintResult[]> {
-      const results = await super.lintText(code, options);
-      return translateLintResults(results as ESLintType.LintResult[]);
-    }
-  }
-
-  proxyCache.set(Base, ESLintProxy as unknown as ESLintClass);
-  return proxyCache.get(Base)!;
-}
-
-const ESLintJaProxyCJS = createProxyClass(OriginalESLint as ESLintClass);
-
-module.exports = ESLintJaProxyCJS;
-module.exports.ESLint = ESLintJaProxyCJS;
-module.exports.default = ESLintJaProxyCJS;
-module.exports.Linter = Linter;
-if (RuleTester) {
-  module.exports.RuleTester = RuleTester;
-}
-if (SourceCode) {
-  module.exports.SourceCode = SourceCode;
-}
-
-module.exports.loadESLint = async function loadESLint(options?: Parameters<NonNullable<ESLintLoadFn>>[0]) {
+async function loadESLintProxy(options?: Parameters<NonNullable<ESLintModule['loadESLint']>>[0]) {
   if (!originalLoadESLint) {
-    return ESLintJaProxyCJS;
+    if (options?.useFlatConfig === false && LegacyESLintProxy) {
+      return LegacyESLintProxy;
+    }
+    if (options?.useFlatConfig && FlatESLintProxy) {
+      return FlatESLintProxy;
+    }
+    return (ESLintProxy ?? OriginalESLint) as ESLintLikeConstructor;
   }
 
   const LoadedESLint = await originalLoadESLint(options);
-  return createProxyClass(LoadedESLint as ESLintClass);
+  return createProxyClass(LoadedESLint as ESLintLikeConstructor);
+}
+
+const exported: Record<string, unknown> = {
+  ...eslintModule,
+  ESLint: (ESLintProxy ?? OriginalESLint) as ESLintModule['ESLint'],
+  loadESLint: loadESLintProxy as ESLintModule['loadESLint'],
+  Linter,
+  RuleTester,
+  SourceCode,
+  FlatESLint: (FlatESLintProxy ?? OriginalFlatESLint) ?? undefined,
+  LegacyESLint: (LegacyESLintProxy ?? OriginalLegacyESLint) ?? undefined,
 };
+
+module.exports = exported;
+module.exports.default = exported;
+module.exports.ESLint = exported.ESLint;
+module.exports.loadESLint = exported.loadESLint;
+module.exports.Linter = Linter;
+module.exports.RuleTester = RuleTester;
+module.exports.SourceCode = SourceCode;
+module.exports.FlatESLint = exported.FlatESLint;
+module.exports.LegacyESLint = exported.LegacyESLint;
+
+Object.defineProperty(module.exports, '__esModule', { value: true });

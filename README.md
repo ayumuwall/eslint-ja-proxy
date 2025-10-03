@@ -34,6 +34,7 @@ npm i -D eslint eslint-ja-proxy
 1. IDE設定 → **言語＆フレームワーク > JavaScript > コード品質ツール > ESLint**
 2. **マニュアル ESLint 構成** を選ぶ
 3. **ESLint パッケージ** に node_modules/eslint-ja-proxy を指定 → *問題*パネル に日本語メッセージが出ます
+   - 開発中のローカルビルドを使う場合は `pnpm build` を実行してから IDE を再起動してください（JetBrains は `../lib/unsupported-api` を参照するため、ビルド済みの `lib/` ディレクトリが必要です）。
 
 ### VS Code
 **おすすめ：npm エイリアス** で `eslint` を置き換えます。
@@ -93,7 +94,7 @@ node -r eslint-ja-proxy/register node_modules/.bin/eslint .
 ---
 
 ## トラブル時のチェック
-- JetBrains：**Manual** になっているか？ **ESLint package** が `eslint-ja-proxy` か？
+- JetBrains：**Manual** になっているか？ **ESLint package** が `eslint-ja-proxy` か？ビルド済みの `lib/unsupported-api.js` が存在するか？
 - VS Code：`node_modules/eslint` が **このパッケージ**になっているか？（npm エイリアス）
 - CI：`npx eslint-ja` を呼んでいるか？
 
