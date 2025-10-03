@@ -1,0 +1,424 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`翻訳統合テスト - Core Rules > core-errors.js の各ルールが日本語化される 1`] = `
+[
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていません。",
+    "messageId": "undef",
+    "ruleId": "no-undef",
+  },
+  {
+    "message": "予期しない console 文です。",
+    "messageId": "unexpected",
+    "ruleId": "no-console",
+  },
+  {
+    "message": "'{name}' は定義されていません。",
+    "messageId": "undef",
+    "ruleId": "no-undef",
+  },
+  {
+    "message": "'{name}' は定義されていません。",
+    "messageId": "undef",
+    "ruleId": "no-undef",
+  },
+  {
+    "message": "予期しない console 文です。",
+    "messageId": "unexpected",
+    "ruleId": "no-console",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "セミコロンがありません。",
+    "messageId": "missingSemi",
+    "ruleId": "semi",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "{description}を使用してください。",
+    "messageId": "wrongQuotes",
+    "ruleId": "quotes",
+  },
+  {
+    "message": "'{operator}' の代わりに '{expectedOperator}' を使用してください。",
+    "messageId": "unexpected",
+    "ruleId": "eqeqeq",
+  },
+  {
+    "message": "'{name}' は定義されていません。",
+    "messageId": "undef",
+    "ruleId": "no-undef",
+  },
+  {
+    "message": "予期しない console 文です。",
+    "messageId": "unexpected",
+    "ruleId": "no-console",
+  },
+  {
+    "message": "'var' の代わりに 'let' または 'const' を使用してください。",
+    "messageId": "unexpectedVar",
+    "ruleId": "no-var",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "'{name}' は再代入されていません。'const' を使用してください。",
+    "messageId": "useConst",
+    "ruleId": "prefer-const",
+  },
+  {
+    "message": "'{name}' は定義されていません。",
+    "messageId": "undef",
+    "ruleId": "no-undef",
+  },
+  {
+    "message": "予期しない console 文です。",
+    "messageId": "unexpected",
+    "ruleId": "no-console",
+  },
+  {
+    "message": "'{name}' は const 変数です。再代入できません。",
+    "messageId": "const",
+    "ruleId": "no-const-assign",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "オブジェクトリテラルで重複したキー '{name}' があります。",
+    "messageId": "unexpected",
+    "ruleId": "no-dupe-keys",
+  },
+  {
+    "message": "重複した case ラベルがあります。",
+    "messageId": "unexpected",
+    "ruleId": "no-duplicate-case",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "到達不可能なコードです。",
+    "messageId": "unreachableCode",
+    "ruleId": "no-unreachable",
+  },
+  {
+    "message": "'{name}' は定義されていません。",
+    "messageId": "undef",
+    "ruleId": "no-undef",
+  },
+  {
+    "message": "予期しない console 文です。",
+    "messageId": "unexpected",
+    "ruleId": "no-console",
+  },
+  {
+    "message": "空のブロック文です。",
+    "messageId": "unexpected",
+    "ruleId": "no-empty",
+  },
+  {
+    "message": "条件文の後に波括弧が必要です。",
+    "messageId": "missingCurlyAfterCondition",
+    "ruleId": "curly",
+  },
+  {
+    "message": "'{name}' は定義されていません。",
+    "messageId": "undef",
+    "ruleId": "no-undef",
+  },
+  {
+    "message": "予期しない console 文です。",
+    "messageId": "unexpected",
+    "ruleId": "no-console",
+  },
+  {
+    "message": "'{name}' は既に宣言されています。",
+    "messageId": "redeclared",
+    "ruleId": "no-redeclare",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+]
+`;
+
+exports[`翻訳統合テスト - TypeScript Rules > typescript-errors.ts の各ルールが日本語化される 1`] = `
+[
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "予期しない any 型です。代わりに具体的な型を指定してください。",
+    "messageId": "unexpectedAny",
+    "ruleId": "@typescript-eslint/no-explicit-any",
+  },
+  {
+    "message": "予期しない any 型です。代わりに具体的な型を指定してください。",
+    "messageId": "unexpectedAny",
+    "ruleId": "@typescript-eslint/no-explicit-any",
+  },
+  {
+    "message": "関数 '{name}' の戻り値の型を明示してください。",
+    "messageId": "missingReturnType",
+    "ruleId": "@typescript-eslint/explicit-function-return-type",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "'{name}' の型は推論可能です。型注釈は不要です。",
+    "messageId": "noInferrableType",
+    "ruleId": "@typescript-eslint/no-inferrable-types",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "'{name}' の型は推論可能です。型注釈は不要です。",
+    "messageId": "noInferrableType",
+    "ruleId": "@typescript-eslint/no-inferrable-types",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.",
+    "messageId": "tsIgnoreInsteadOfExpectError",
+    "ruleId": "@typescript-eslint/ban-ts-comment",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "An empty interface declaration allows any non-nullish value, including literals like \`0\` and \`""\`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowInterfaces' rule option.
+- If you want a type meaning "any object", you probably want \`object\` instead.
+- If you want a type meaning "any value", you probably want \`unknown\` instead.",
+    "messageId": "noEmptyInterface",
+    "ruleId": "@typescript-eslint/no-empty-object-type",
+  },
+  {
+    "message": "空のインターフェース '{name}' です。",
+    "messageId": "noEmpty",
+    "ruleId": "@typescript-eslint/no-empty-interface",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "An interface declaring no members is equivalent to its supertype.",
+    "messageId": "noEmptyInterfaceWithSuper",
+    "ruleId": "@typescript-eslint/no-empty-object-type",
+  },
+  {
+    "message": "空のインターフェース '{name}' で拡張のみを行っています。type エイリアスを使用してください。",
+    "messageId": "noEmptyWithSuper",
+    "ruleId": "@typescript-eslint/no-empty-interface",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "A \`require()\` style import is forbidden.",
+    "messageId": "noRequireImports",
+    "ruleId": "@typescript-eslint/no-require-imports",
+  },
+  {
+    "message": "'require' 文の代わりに ES6 形式の import を使用してください。",
+    "messageId": "noVarReqs",
+    "ruleId": "@typescript-eslint/no-var-requires",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "Expected a \`const\` instead of a literal type assertion.",
+    "messageId": "preferConstAssertion",
+    "ruleId": "@typescript-eslint/prefer-as-const",
+  },
+  {
+    "message": "'module' キーワードの代わりに 'namespace' を使用してください。",
+    "messageId": "useNamespace",
+    "ruleId": "@typescript-eslint/prefer-namespace-keyword",
+  },
+  {
+    "message": "ES2015 module syntax is preferred over namespaces.",
+    "messageId": "moduleSyntaxIsPreferred",
+    "ruleId": "@typescript-eslint/no-namespace",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "ES2015 module syntax is preferred over namespaces.",
+    "messageId": "moduleSyntaxIsPreferred",
+    "ruleId": "@typescript-eslint/no-namespace",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "オーバーロードされたシグネチャ '{name}' は隣接している必要があります。",
+    "messageId": "adjacentSignature",
+    "ruleId": "@typescript-eslint/adjacent-overload-signatures",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "配列型は '{type}[]' ではなく '{readonlyPrefix}Array<{type}>' として記述してください。",
+    "messageId": "errorStringArray",
+    "ruleId": "@typescript-eslint/array-type",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "型定義には type ではなく interface を使用してください。",
+    "messageId": "interfaceOverType",
+    "ruleId": "@typescript-eslint/consistent-type-definitions",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "非nullアサーション演算子 '!' の使用は禁止されています。",
+    "messageId": "noNonNull",
+    "ruleId": "@typescript-eslint/no-non-null-assertion",
+  },
+  {
+    "message": "'{name}' は定義されていますが使用されていません。",
+    "messageId": "unusedVar",
+    "ruleId": "@typescript-eslint/no-unused-vars",
+  },
+  {
+    "message": "オプショナルチェーン '?.' を使用してください。",
+    "messageId": "preferOptionalChain",
+    "ruleId": "@typescript-eslint/prefer-optional-chain",
+  },
+]
+`;
