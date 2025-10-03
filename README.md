@@ -31,10 +31,9 @@ npm i -D eslint eslint-ja-proxy
 
 ## 使い方（かんたん）
 ### JetBrains（WebStorm/IntelliJ）
-1. IDE設定 → **Languages & Frameworks > JavaScript > Code Quality Tools > ESLint**
-2. **Manual ESLint configuration** を選ぶ
-3. **ESLint package** に `node_modules/eslint-ja-proxy` を指定
-→ *Problems* に日本語メッセージが出ます
+1. IDE設定 → **言語＆フレームワーク > JavaScript > コード品質ツール > ESLint**
+2. **マニュアル ESLint 構成** を選ぶ
+3. **ESLint パッケージ** に node_modules/eslint-ja-proxy を指定 → *問題*パネル に日本語メッセージが出ます
 
 ### VS Code
 **おすすめ：npm エイリアス** で `eslint` を置き換えます。

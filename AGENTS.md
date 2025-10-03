@@ -116,7 +116,67 @@ pnpm -C scripts/snapshot-fixtures/angular19 test
 
 ## 機械可読の仕様追加（LLM/Coding Agent 向け）
 
-### 1) 辞書追記用の JSON スキーマ
+### 1) Commit Message Policy (for Coding Agents)
+
+エージェントは **必ず Title/Desc 構造**でコミットすること。
+
+```
+<type>(<scope>): <title>
+
+<desc/body...>
+```
+
+#### 1) Title（件名）
+
+* 形式: `<type>(<scope>): <title>`
+* `type` は Conventional Commits に準拠：
+  `feat | fix | docs | refactor | perf | test | build | ci | chore | style | revert`
+* 1 行・**50 文字以内**（日本語可）。末尾の句読点は付けない。
+* **命令形/現在形**で「何をするコミットか」を短く表す。
+* 破壊的変更は `type!:` とし、本文に `BREAKING CHANGE:` セクションを入れる。
+* 例：
+
+    * `fix(ide): ESLint の動的解決を有効化`
+    * `feat(cli): --help/--version の出力を改善`
+
+#### 2) Desc（本文 / Body）
+
+* **タイトルの後に空行**を 1 行入れてから本文を始める（Git の慣習／GitHub の表示最適化）。
+* 各行は **~72 文字**目安で改行。箇条書き・小見出しは Markdown 可。
+* 原則として下記テンプレートを埋める：
+
+```
+主な変更:
+- ～
+
+理由 / 背景:
+- ～
+
+動作確認:
+- ～
+
+影響範囲:
+- ～
+
+互換性:
+- 破壊的変更なし
+# 破壊的変更がある場合は下行を使用
+# BREAKING CHANGE:
+# - ～
+
+関連:
+- Issue: #123
+- PR: <link があれば>
+- 参考: <設計/議論へのリンク等>
+```
+
+> メモ：
+>
+> * **Desc は“何を/なぜ/どう検証したか/影響は何か”**が 1 スクロールで把握できる粒度で。
+> * スクショやログ断片は必要最小限にし、詳細はリンク先に置く。
+
+
+### 2) 辞書追記用の JSON スキーマ
 
 **目的**: `ruleId / messageId / data` を軸に、1件ずつ安全に辞書を追加できるようにします。\
 \*\*単一エントリ（TranslationEntry）\*\*のスキーマ（JSON Schema draft‑07 互換）：
@@ -174,7 +234,7 @@ pnpm -C scripts/snapshot-fixtures/angular19 test
 
 ---
 
-### 2) PR 同梱ファイル `dict.patch.json` の固定フォーマット
+### 3) PR 同梱ファイル `dict.patch.json` の固定フォーマット
 
 **目的**: 自動レビューとマージを簡単にします。
 
@@ -212,7 +272,7 @@ pnpm -C scripts/snapshot-fixtures/angular19 test
 
 ---
 
-### 3) 安全ガード（Do/Don't）
+### 4) 安全ガード（Do/Don't）
 
 **Do（必ず守る）**
 
